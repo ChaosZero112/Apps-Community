@@ -35,13 +35,15 @@
         pg_volumes:
           - '/etc/localtime:/etc/localtime:ro'
           - '/opt/appdata/{{pgrole}}:/data'
-          - '/opt/appdata/rutorrent/sock/.rtorrent.sock:/data/rtorrent.sock'
+          - '/opt/appdata/rutorrent/sock/:/data'
 
     - name: 'Setting PG ENV'
       set_fact:
         pg_env:
           RTORRENT_SCGI_HOST: 'rutorrent'
           RTORRENT_SOCK: 'true'
+
+
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
