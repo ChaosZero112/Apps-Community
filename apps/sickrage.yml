@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Title:      PlexGuide (Reference Title File)
-# Author(s):  Admin9705
-# URL:        https://plexguide.com - http://github.plexguide.com
+# Title:      sickrage
+# Author(s):  echel0n, linuxserver
+# URL:        https://www.sickrage.ca/ - https://git.sickrage.ca/SiCKRAGE/sickrage
 # GNU:        General Public License v3.0
 ################################################################################
 ---
@@ -13,23 +13,18 @@
 
     - name: 'Set Known Facts'
       set_fact:
-        pgrole: "medusa"
+        pgrole: "sickrage"
         intport: "8081"
-        extport: "8081"
-        image: "linuxserver/medusa"
+        extport: "9191"
+        image: "linuxserver/sickrage:latest"
 
     - name: 'Including cron job'
       include_tasks: '/opt/communityapps/apps/_core.yml'
 
-# EXTRA FUNCTIONS REQUIRED BY THE ROLE #####################################
-
-##### NOTHING REQUIRED
-
-# LABELS #### KEEPS BOTTOM CLEAN ###########################################
+# LABELS ################################################################
     - name: 'Adding Traefik'
       set_fact:
         pg_labels:
-          traefik.protocol: 'http'
           traefik.frontend.auth.forward.address: '{{gauth}}'
           traefik.enable: 'true'
           traefik.port: '{{intport}}'
@@ -46,10 +41,11 @@
     - name: 'Setting PG ENV'
       set_fact:
         pg_env:
-          PUID: '1000'
-          PGID: '1000'
+          PUID: 1000
+          PGID: 1000
+          
 
-    # MAIN SCRIPT ##############################################################
+    # MAIN DEPLOYMENT ##############################################################
 
     - name: 'Deploying {{pgrole}}'
       docker_container:
