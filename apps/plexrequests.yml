@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Title:      Flood (WebUI for rTorrent)
-# Author(s):  John Furrow (jfurrow)
-# URL:        github.com/jfurrow/flood
+# Title:      Plex Requests
+# Author(s):  lokenx
+# URL:        http://plexrequests.8bits.ca/ | https://github.com/lokenx/plexrequests-meteor
 # GNU:        General Public License v3.0
 ################################################################################
 ---
@@ -12,10 +12,10 @@
     # FACTS #######################################################################
     - name: 'Set Known Facts'
       set_fact:
-        pgrole: 'flood'
+        pgrole: 'plexrequests'
         intport: '3000'
-        extport: '3333'
-        image: 'lusky3/flood:latest'
+        extport: '3300'
+        image: 'linuxserver/plexrequests:latest'
 
     # CORE (MANDATORY) ############################################################
     - name: 'Including cron job'
@@ -34,16 +34,13 @@
       set_fact:
         pg_volumes:
           - '/etc/localtime:/etc/localtime:ro'
-          - '/opt/appdata/{{pgrole}}:/data'
-          - '/opt/appdata/rutorrent/sock/:/data'
+          - '/opt/appdata/{{pgrole}}:/config'
 
     - name: 'Setting PG ENV'
       set_fact:
         pg_env:
-          RTORRENT_SCGI_HOST: 'rutorrent'
-          RTORRENT_SOCK: 'true'
-
-
+          PUID: '1000'
+          PGID: '1000'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
