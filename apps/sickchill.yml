@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Title:      sickrage
-# Author(s):  echel0n, linuxserver
-# URL:        https://www.sickrage.ca/ - https://git.sickrage.ca/SiCKRAGE/sickrage
+# Title:      sickchill
+# Author(s):  Alexis Tyler, miigotu, fernandog, sickchill community, binhex
+# URL:        https://sickchill.github.io/ - https://github.com/SickChill/SickChill
 # GNU:        General Public License v3.0
 ################################################################################
 ---
@@ -13,10 +13,10 @@
 
     - name: 'Set Known Facts'
       set_fact:
-        pgrole: "sickrage"
+        pgrole: "sickchill"
         intport: "8081"
-        extport: "9191"
-        image: "linuxserver/sickrage:latest"
+        extport: "9292"
+        image: "binhex/arch-sickchill:latest"
 
     - name: 'Including cron job'
       include_tasks: '/opt/communityapps/apps/_core.yml'
@@ -34,8 +34,8 @@
       set_fact:
         pg_volumes:
           - '/opt/appdata/{{pgrole}}:/config'
-          - '{{path.stdout}}:{{path.stdout}}'
           - '/mnt:/mnt'
+          - '{{path.stdout}}:{{path.stdout}}'
           - '/etc/localtime:/etc/localtime:ro'
 
     - name: 'Setting PG ENV'
