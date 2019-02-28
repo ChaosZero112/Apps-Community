@@ -12,7 +12,7 @@
     # FACTS #######################################################################
     - name: 'Set Known Facts'
       set_fact:
-        pgrole: 'deluge'
+        pgrole: 'delugevpn'
         intport: '8112'
         extport: '8112'
         intport2: '58846'
@@ -79,6 +79,8 @@
         volumes: '{{pg_volumes}}'
         env: '{{pg_env}}'
         restart_policy: unless-stopped
+        capabilities:
+          - NET_ADMIN
         networks:
           - name: plexguide
             aliases:
