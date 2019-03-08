@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-# Title:      PGBlitz (Reference Title File)
-# Author(s):  Admin9705
-# URL:        https://pgblitz.com - http://github.pgblitz.com
+# Title:      Deluge (with OpenVPN, Privoxy)
+# Author(s):  Andrew Resch, Damien Churchill, John Garland, Calum Lind, binhex
+# URL:        https://deluge-torrent.org/ - https://github.com/binhex/arch-delugevpn
 # GNU:        General Public License v3.0
 ################################################################################
 ---
@@ -21,7 +21,7 @@
         extport3: '58946'
         intport4: '8118'
         extport4: '8118'
-        image: 'binhex/arch-delugevpn'
+        image: 'binhex/arch-delugevpn:latest'
 
     # CORE (MANDATORY) ############################################################
     - name: 'Including cron job'
@@ -57,13 +57,14 @@
         pg_env:
           PUID: '1000'
           PGID: '1000'
-          VPN_ENABLED: yes
+          VPN_ENABLED: 'yes'
           VPN_USER: vpnuser
           VPN_PASS: vpnpass
           VPN_PROV: custom
-          ENABLE_PRIVOXY: no
-          STRICT_PORT_FORWARD: no
+          ENABLE_PRIVOXY: 'no'
+          STRICT_PORT_FORWARD: 'no'
           LAN_NETWORK: 192.168.1.1/24
+          VPN_OPTIONS: '--inactive 3600 --ping 10 --ping-exit 60'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
@@ -79,6 +80,10 @@
         volumes: '{{pg_volumes}}'
         env: '{{pg_env}}'
         restart_policy: unless-stopped
+        devices:
+          - '/dev/net/tun:/dev/net/tun:rwm'
+        capabilities:
+          - NET_ADMIN
         networks:
           - name: plexguide
             aliases:
