@@ -280,12 +280,15 @@
           docker_container:
             name: '{{pgrole}}'
             state: stopped
+        
+        - name: 'Creating Blocklist configuration file'
+            shell: "touch /opt/appdata/{{pgrole}}/blocklist.conf && chown -R {{PUID}}:{{PGID}} /opt/appdata/{{pgrole}}/blocklist.conf"
 
         - name: Setting blocklist
           lineinfile:
             path: '/opt/appdata/{{pgrole}}/blocklist.conf'
             regexp: '[^{]'
-            line: '{\n\r  "file": 1, \n\r  "format": 1\n\r}{\n\r  "check_after_days": 4, \n\r  "timeout": 180, \n\r  "url": "http://john.bitsurge.net/public/biglist.p2p.gz", \n\r  "try_times": 3, \n\r  "list_size": 7654253, \n\r  "last_update": 1551247465.33901, \n\r  "list_type": "PeerGuardian", \n\r  "list_compression": "GZip", \n\r  "load_on_start": true\n\r}'
+            line: '{\n\r  "file": 1, \n\r  "format": 1\n\r}{\n\r  "check_after_days": 4, \n\r  "timeout": 180, \n\r  "url": "http://john\.bitsurge\.net/public/biglist\.p2p\.gz", \n\r  "try_times": 3, \n\r  "list_size": 7654253, \n\r  "last_update": 1551247465\.33901, \n\r  "list_type": "PeerGuardian", \n\r  "list_compression": "GZip", \n\r  "load_on_start": true\n\r}'
             state: present
 
         - name: Setting extractor folder
