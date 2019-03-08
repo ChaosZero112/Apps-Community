@@ -35,6 +35,11 @@
         path: /opt/appdata/{{pgrole}}/core.conf
       register: confcheck
 
+    - name: 'Checking for plugin data'
+      stat:
+        path: /opt/appdata/{{pgrole}}/extractor.conf
+      register: extractcheck
+
     # LABELS ######################################################################
     - name: 'Adding Traefik'
       set_fact:
@@ -151,20 +156,6 @@
         line: '"move_completed": true,'
         state: present
 
-    - name: Setting extractor folder
-      lineinfile:
-        path: '/opt/appdata/{{pgrole}}/extractor.conf'
-        regexp: '"use_name_folder".*'
-        line: '"use_name_folder": true,'
-        state: present
-
-    - name: Setting extractor
-      lineinfile:
-        path: '/opt/appdata/{{pgrole}}/extractor.conf'
-        regexp: '"extract_path".*'
-        line: '"extract_path": "{{path.stdout}}/downloads/deluge"'
-        state: present
-
     # FIRST TIME CONFIGURATION ####################################################
     - name: 'Configuring {{pgrole}} for first time use'
       block:
@@ -172,7 +163,7 @@
           lineinfile:
             path: '/opt/appdata/{{pgrole}}/core.conf'
             regexp: '"enabled_plugins".*'
-            line: '"enabled_plugins": ["Extractor", "Label"],'
+            line: '"enabled_plugins": ["Extractor", "Blocklist", "Label"],'
             state: present
 
         - name: set compact_allocation
@@ -274,6 +265,42 @@
             state: present
       when: not confcheck.stat.exists
 
+    - name: 'Configuring {{pgrole}} for first time use'
+      block:
+        - name: 'Waiting for {{pgrole}} to initialize'
+          docker_container:
+            name: '{{pgrole}}'
+            state: started
+          wait_for:
+           timeout: 10
+
+        - name: Stopping {{pgrole}}
+          docker_container:
+            name: '{{pgrole}}'
+            state: stopped
+
+        - name: Setting extractor
+          lineinfile:
+            path: '/opt/appdata/{{pgrole}}/blocklist.conf'
+            regexp: '[^{]'
+            line: '{\n\r  "file": 1, \n\r  "format": 1\n\r}{\n\r  "check_after_days": 4, \n\r  "timeout": 180, \n\r  "url": "http://john.bitsurge.net/public/biglist.p2p.gz", \n\r  "try_times": 3, \n\r  "list_size": 7654253, \n\r  "last_update": 1551247465.33901, \n\r  "list_type": "PeerGuardian", \n\r  "list_compression": "GZip", \n\r  "load_on_start": true\n\r}'
+            state: present
+
+        - name: Setting extractor folder
+            lineinfile:
+            path: '/opt/appdata/{{pgrole}}/extractor.conf'
+            regexp: '"use_name_folder".*'
+            line: '"use_name_folder": true,'
+            state: present
+
+        - name: Setting extractor
+          lineinfile:
+            path: '/opt/appdata/{{pgrole}}/extractor.conf'
+            regexp: '"extract_path".*'
+            line: '"extract_path": "{{path.stdout}}/downloads/deluge"'
+            state: present
+      when: not extractcheck.stat.exists
+      
     - name: Restart {{pgrole}}
       docker_container:
         name: '{{pgrole}}'
