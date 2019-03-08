@@ -57,14 +57,16 @@
         pg_env:
           PUID: '1000'
           PGID: '1000'
-          VPN_ENABLED: 'yes'
+          VPN_ENABLED: 'no'
           VPN_USER: vpnuser
           VPN_PASS: vpnpass
           VPN_PROV: custom
           ENABLE_PRIVOXY: 'no'
           STRICT_PORT_FORWARD: 'no'
-          LAN_NETWORK: 192.168.1.1/24
-          VPN_OPTIONS: '--inactive 3600 --ping 10 --ping-exit 60'
+          LAN_NETWORK: '172.18.0.0/16'
+          NAME_SERVERS: '1.1.1.1,208.67.222.222,23.94.60.240,1.0.0.1,208.67.220.220'
+          DELUGE_DAEMON_LOG_LEVEL: 'info'
+          DELUGE_WEB_LOG_LEVEL: 'info'
 
     # MAIN DEPLOYMENT #############################################################
     - name: 'Deploying {{pgrole}}'
