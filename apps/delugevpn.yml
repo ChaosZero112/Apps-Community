@@ -282,7 +282,7 @@
             state: stopped
         
         - name: 'Creating Blocklist configuration file'
-          shell: "touch /opt/appdata/{{pgrole}}/blocklist.conf && chown -R {{PUID}}:{{PGID}} /opt/appdata/{{pgrole}}/blocklist.conf"
+          shell: "touch /opt/appdata/{{pgrole}}/blocklist.conf && chown -R 1000:1000 /opt/appdata/{{pgrole}}/blocklist.conf"
 
         - name: Setting blocklist
           lineinfile:
