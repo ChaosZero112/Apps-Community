@@ -13,9 +13,11 @@
     - name: 'Set Known Facts'
       set_fact:
         pgrole: 'guacamole'
+        pgrole2: 'guacd'
         intport: '8080'
         extport: '5454'
         image: 'guacamole/guacamole:latest'
+        image2: 'guacamole/guacd:latest'
 
     # CORE (MANDATORY) ############################################################
     - name: 'Including cron job'
@@ -30,22 +32,35 @@
           traefik.port: '{{intport}}'
           traefik.frontend.rule: 'Host:{{pgrole}}.{{domain.stdout}},{{tldset}}'
 
-    - name: 'Setting PG Volumes'
-      set_fact:
-        pg_volumes:
+    # - name: 'Setting PG Volumes'
+    #   set_fact:
+    #     pg_volumes:
 
-    - name: 'Setting PG ENV'
-      set_fact:
-        pg_env:
-          POSTGRES_DATABASE:
-          POSTGRES_USER:
-          POSTGRES_PASSWORD:
-          MYSQL_DATABASE:
-          MYSQL_USER:
-          MYSQL_PASSWORD:
+    # - name: 'Setting PG ENV'
+    #   set_fact:
+    #     pg_env:
+    #       POSTGRES_DATABASE: ''
+    #       POSTGRES_USER: ''
+    #       POSTGRES_PASSWORD: ''
+    #       MYSQL_DATABASE: ''
+    #       MYSQL_USER: ''
+    #       MYSQL_PASSWORD: ''
 
 
     # MAIN DEPLOYMENT #############################################################
+    - name: 'Deploying {{pgrole2}}'
+      docker_container:
+        name: '{{pgrole2}}'
+        image: '{{image2}}'
+        pull: yes
+        restart_policy: unless-stopped
+        networks:
+          - name: plexguide
+            aliases:
+              - '{{pgrole2}}'
+        state: started
+        labels: ''
+
     - name: 'Deploying {{pgrole}}'
       docker_container:
         name: '{{pgrole}}'
@@ -53,8 +68,9 @@
         pull: yes
         published_ports:
           - '{{ports.stdout}}{{extport}}:{{intport}}'
-        volumes: '{{pg_volumes}}'
-        env: '{{pg_env}}'
+        # env: '{{pg_env}}'
+        links:
+          - '{{pgrole}}:{{pgrole2}}'
         restart_policy: unless-stopped
         networks:
           - name: plexguide
