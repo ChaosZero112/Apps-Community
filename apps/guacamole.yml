@@ -69,7 +69,7 @@
           - '{{ports.stdout}}{{extport}}:{{intport}}'
         # env: '{{pg_env}}'
         links:
-          - '{{pgrole}}:{{pgrole2}}'
+          - '{{pgrole2}}:{{pgrole2}}'
         restart_policy: unless-stopped
         networks:
           - name: plexguide
