@@ -1,0 +1,64 @@
+#!/bin/bash
+#
+# Title:      Apache Guacamole™
+# Author(s):  The Apache Software Foundation
+# URL:        https://guacamole.apache.org/ | https://hub.docker.com/r/guacamole/guacamole/
+# GNU:        Apache License, Version 2.0
+################################################################################
+---
+- hosts: localhost
+  gather_facts: false
+  tasks:
+    # FACTS #######################################################################
+    - name: 'Set Known Facts'
+      set_fact:
+        pgrole: 'guacamole'
+        intport: '8080'
+        extport: '5454'
+        image: 'guacamole/guacamole:latest'
+
+    # CORE (MANDATORY) ############################################################
+    - name: 'Including cron job'
+      include_tasks: '/opt/communityapps/apps/_core.yml'
+
+    # LABELS ######################################################################
+    - name: 'Adding Traefik'
+      set_fact:
+        pg_labels:
+          traefik.frontend.auth.forward.address: '{{gauth}}'
+          traefik.enable: 'true'
+          traefik.port: '{{intport}}'
+          traefik.frontend.rule: 'Host:{{pgrole}}.{{domain.stdout}},{{tldset}}'
+
+    - name: 'Setting PG Volumes'
+      set_fact:
+        pg_volumes:
+
+    - name: 'Setting PG ENV'
+      set_fact:
+        pg_env:
+          POSTGRES_DATABASE:
+          POSTGRES_USER:
+          POSTGRES_PASSWORD:
+          MYSQL_DATABASE:
+          MYSQL_USER:
+          MYSQL_PASSWORD:
+
+
+    # MAIN DEPLOYMENT #############################################################
+    - name: 'Deploying {{pgrole}}'
+      docker_container:
+        name: '{{pgrole}}'
+        image: '{{image}}'
+        pull: yes
+        published_ports:
+          - '{{ports.stdout}}{{extport}}:{{intport}}'
+        volumes: '{{pg_volumes}}'
+        env: '{{pg_env}}'
+        restart_policy: unless-stopped
+        networks:
+          - name: plexguide
+            aliases:
+              - '{{pgrole}}'
+        state: started
+        labels: '{{pg_labels}}'
