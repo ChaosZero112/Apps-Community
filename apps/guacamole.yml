@@ -59,7 +59,6 @@
             aliases:
               - '{{pgrole2}}'
         state: started
-        labels: ''
 
     - name: 'Deploying {{pgrole}}'
       docker_container:
